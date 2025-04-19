@@ -89,9 +89,12 @@ $$
 
 Where:
 $\( \lambda_k \)$ are the eigenvalues of $\( L(0) \)$
+
 $$
-\( \mathbf{v}_k = \begin{bmatrix} c_k \\ d_k \end{bmatrix} \)
+\mathbf{v}_k =
+\begin{bmatrix} c_k \\ d_k \end{bmatrix}
 $$ 
+
 are the normalized eigenvectors corresponding to $\( \lambda_k \)$
 
 Then the positions evolve as:
