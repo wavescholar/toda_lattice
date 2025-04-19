@@ -1,10 +1,10 @@
 
-## Define the Lax Pair \( L \) and \( B \)
+## Define the Lax Pair $\( L \)$ and $\( B \)$
 
-We begin with the 2-particle Toda lattice. The Lax pair consists of two \( 2 \times 2 \) matrices:
+We begin with the 2-particle Toda lattice. The Lax pair consists of two $\( 2 \times 2 \)$ matrices:
 
-- \( L \): symmetric matrix encoding momenta and coupling
-- \( B \): skew-symmetric matrix defining the flow
+$\( L \)$: symmetric matrix encoding momenta and coupling
+$\( B \)$: skew-symmetric matrix defining the flow
 
 The matrices are:
 
@@ -22,7 +22,7 @@ $$
 
 Where:
 
-$\( p_1, p_2 \)$ are the momenta of particles 1 and 2
+$\( p_1, p_2 \)$ are the momenta of particles 1 and 2 and
 $\( a_1 = e^{(q_2 - q_1)/2} \)$ depends on positions $\( q_1 \)$ and $\( q_2 \)$
 
 The Lax equation is:
@@ -47,7 +47,7 @@ $$
 L(t) = e^{tB} L(0) e^{-tB}
 $$
 
-Because \( B \) is skew-symmetric, \( e^{tB} \) is a rotation matrix. Define:
+Because $\( B \)$ is skew-symmetric, $\( e^{tB} \)$ is a rotation matrix. Define:
 
 $$
 J = \begin{bmatrix} 0 & -1 \\ 1 & 0 \end{bmatrix}, \quad B = a_1 J
@@ -69,7 +69,7 @@ $$
 L(t) = e^{tB} L(0) e^{-tB}
 $$
 
-The eigenvalues of \( L(t) \) remain constant over time — a hallmark of integrability (isospectral evolution).
+The eigenvalues of $\( L(t) \)$ remain constant over time — a hallmark of integrability (isospectral evolution).
 
 
 ## Toda Tau Functions (2-Particle Case)
@@ -80,7 +80,7 @@ $$
 q_i(t) = \log \frac{\tau_{i-1}(t)}{\tau_i(t)}
 $$
 
-For the 2-particle system, we have two tau functions \( \tau_0(t) \) and \( \tau_1(t) \), constructed from the eigenvalues and eigenvectors of the initial Lax matrix \( L(0) \). Specifically:
+For the 2-particle system, we have two tau functions $\( \tau_0(t) \)$ and $\( \tau_1(t) \)$, constructed from the eigenvalues and eigenvectors of the initial Lax matrix \( L(0) \). Specifically:
 
 $$
 \tau_0(t) = \sum_{k=1}^2 c_k^2 \, e^{\lambda_k t}, \quad
@@ -88,8 +88,8 @@ $$
 $$
 
 Where:
-\( \lambda_k \) are the eigenvalues of \( L(0) \)
-\( \mathbf{v}_k = \begin{bmatrix} c_k \\ d_k \end{bmatrix} \) are the normalized eigenvectors corresponding to \( \lambda_k \)
+$\( \lambda_k \)$ are the eigenvalues of $\( L(0) \)$
+$\( \mathbf{v}_k = \begin{bmatrix} c_k \\ d_k \end{bmatrix} \)$ are the normalized eigenvectors corresponding to $\( \lambda_k \)$
 
 Then the positions evolve as:
 
