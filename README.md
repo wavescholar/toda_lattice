@@ -80,7 +80,7 @@ $$
 q_i(t) = \log \frac{\tau_{i-1}(t)}{\tau_i(t)}
 $$
 
-For the 2-particle system, we have two tau functions $\( \tau_0(t) \)$ and $\( \tau_1(t) \)$, constructed from the eigenvalues and eigenvectors of the initial Lax matrix \( L(0) \). Specifically:
+For the 2-particle system, we have two tau functions $\( \tau_0(t) \)$ and $\( \tau_1(t) \)$, constructed from the eigenvalues and eigenvectors of the initial Lax matrix $\( L(0) \)$. Specifically:
 
 $$
 \tau_0(t) = \sum_{k=1}^2 c_k^2 \, e^{\lambda_k t}, \quad
@@ -89,7 +89,10 @@ $$
 
 Where:
 $\( \lambda_k \)$ are the eigenvalues of $\( L(0) \)$
-$\( \mathbf{v}_k = \begin{bmatrix} c_k \\ d_k \end{bmatrix} \)$ are the normalized eigenvectors corresponding to $\( \lambda_k \)$
+$$
+\( \mathbf{v}_k = \begin{bmatrix} c_k \\ d_k \end{bmatrix} \)
+$$ 
+are the normalized eigenvectors corresponding to $\( \lambda_k \)$
 
 Then the positions evolve as:
 
