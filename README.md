@@ -22,8 +22,8 @@ $$
 
 Where:
 
-- \( p_1, p_2 \) are the momenta of particles 1 and 2
-- \( a_1 = e^{(q_2 - q_1)/2} \) depends on positions \( q_1 \) and \( q_2 \)
+$\( p_1, p_2 \)$ are the momenta of particles 1 and 2
+$\( a_1 = e^{(q_2 - q_1)/2} \)$ depends on positions $\( q_1 \)$ and $\( q_2 \)$
 
 The Lax equation is:
 
@@ -88,8 +88,8 @@ $$
 $$
 
 Where:
-- \( \lambda_k \) are the eigenvalues of \( L(0) \)
-- \( \mathbf{v}_k = \begin{bmatrix} c_k \\ d_k \end{bmatrix} \) are the normalized eigenvectors corresponding to \( \lambda_k \)
+\( \lambda_k \) are the eigenvalues of \( L(0) \)
+\( \mathbf{v}_k = \begin{bmatrix} c_k \\ d_k \end{bmatrix} \) are the normalized eigenvectors corresponding to \( \lambda_k \)
 
 Then the positions evolve as:
 
