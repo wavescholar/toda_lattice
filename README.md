@@ -1,5 +1,5 @@
 
-## 🔹 Step 1: Define the Lax Pair \( L \) and \( B \)
+## Define the Lax Pair \( L \) and \( B \)
 
 We begin with the 2-particle Toda lattice. The Lax pair consists of two \( 2 \times 2 \) matrices:
 
@@ -39,7 +39,7 @@ $$
 
 ---
 
-## 🔹 Step 2: Evolve the System via Matrix Exponentials
+## Evolve the System via Matrix Exponentials
 
 The Lax equation implies the solution evolves by conjugation:
 
@@ -71,6 +71,36 @@ $$
 
 The eigenvalues of \( L(t) \) remain constant over time — a hallmark of integrability (isospectral evolution).
 
+
+## Toda Tau Functions (2-Particle Case)
+
+For the finite Toda lattice, the particle positions can be expressed in terms of **tau functions**. In the case of two particles, we define:
+
+$$
+q_i(t) = \log \frac{\tau_{i-1}(t)}{\tau_i(t)}
+$$
+
+For the 2-particle system, we have two tau functions \( \tau_0(t) \) and \( \tau_1(t) \), constructed from the eigenvalues and eigenvectors of the initial Lax matrix \( L(0) \). Specifically:
+
+$$
+\tau_0(t) = \sum_{k=1}^2 c_k^2 \, e^{\lambda_k t}, \quad
+\tau_1(t) = \sum_{k=1}^2 d_k^2 \, e^{\lambda_k t}
+$$
+
+Where:
+- \( \lambda_k \) are the eigenvalues of \( L(0) \)
+- \( \mathbf{v}_k = \begin{bmatrix} c_k \\ d_k \end{bmatrix} \) are the normalized eigenvectors corresponding to \( \lambda_k \)
+
+Then the positions evolve as:
+
+$$
+q_1(t) = \log \left( \frac{\tau_0(t)}{\tau_1(t)} \right), \quad
+q_2(t) = -\log \tau_1(t) + \text{const}
+$$
+
+This formulation arises from the **inverse scattering method**, where the full nonlinear dynamics of the Toda lattice are encoded into the spectral data (eigenvalues and eigenvectors) of the Lax matrix.
+
+Tau functions provide an elegant way to reconstruct the solution using only linear algebra and exponential functions.
 
 
 ```
