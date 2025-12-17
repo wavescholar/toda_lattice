@@ -1,0 +1,5 @@
+[0] Config.pm:307> INFO - This is Biber 2.19
+[0] Config.pm:310> INFO - Logfile is './GeneralizedHydrodynamics.blg'
+[38] biber-darwin:340> INFO - === Mon Dec 15, 2025, 10:14:44
+[166] Utils.pm:410> ERROR - Cannot find './GeneralizedHydrodynamics.bcf'!
+[166] Biber.pm:136> INFO - ERRORS: 1

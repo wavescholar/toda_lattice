@@ -1,0 +1,117 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{bm} % For bold math vectors
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+
+% --- MOCK PREAMBLE FOR STANDALONE COMPILATION ---
+% If dropping into an existing doc, ensure these packages
+% or similar environments are defined.
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}{Definition}[section]
+\newtheorem{remark}{Remark}[section]
+% ------------------------------------------------
+
+\begin{document}
+
+% =====================================================================
+% START OF DROP-IN SECTION
+% =====================================================================
+
+\section{Realization of the Cone of Positive Polynomials via SDP}
+
+The study of non-negative polynomials is central to real algebraic geometry and polynomial optimization. While the condition of global non-negativity is computationally intractable in general, it can be effectively approximated—and in many cases exactly realized—by the cone of sums of squares, which admits a tractable characterization using Semidefinite Programming (SDP).
+
+\subsection{The Cones $P_{n,2d}$ and $\Sigma_{n,2d}$}
+
+Let $\mathbb{R}[x] = \mathbb{R}[x_1, \dots, x_n]$ denote the ring of polynomials in $n$ variables with real coefficients. We focus on polynomials of even degree $2d$, as odd-degree polynomials cannot be globally non-negative (they must go to $-\infty$ in some direction).
+
+We define two primary convex cones of interest:
+\begin{itemize}
+    \item \textbf{The Non-negative Cone ($P_{n,2d}$):} The set of polynomials of degree at most $2d$ that are non-negative everywhere on $\mathbb{R}^n$:
+    $$ P_{n,2d} = \{ p(x) \in \mathbb{R}[x]_{2d} \mid p(x) \ge 0 \quad \forall x \in \mathbb{R}^n \} $$
+    \item \textbf{The Sum of Squares (SOS) Cone ($\Sigma_{n,2d}$):} The set of polynomials that can be explicitly written as a sum of squares of other polynomials:
+    $$ \Sigma_{n,2d} = \left\{ p(x) \in \mathbb{R}[x]_{2d} \mid p(x) = \sum_{i=1}^k h_i(x)^2, \quad h_i(x) \in \mathbb{R}[x]_d \right\} $$
+\end{itemize}
+
+It is evident that $\Sigma_{n,2d} \subseteq P_{n,2d}$. Hilbert's seminal work in 1888 established that this inclusion is strict for most cases (specifically, whenever $n \ge 3$ and $2d \ge 4$, with the exception of $n=3, 2d=4$).
+
+\subsection{The Gram Matrix Representation}
+
+The fundamental computational realization of $\Sigma_{n,2d}$ relies on the \textbf{Gram matrix} representation. This representation translates the algebraic structure of SOS polynomials into the linear algebraic structure of positive semidefinite matrices.
+
+Let $\mathbf{v}_d(x)$ be the vector of all monomials in variables $x_1, \dots, x_n$ up to degree $d$. The dimension of this vector is $N = \binom{n+d}{d}$. For example, if $n=2$ and $d=2$, a standard basis choices is:
+$$ \mathbf{v}_2(x,y) = [1, x, y, x^2, xy, y^2]^T $$
+
+Any polynomial $p(x)$ of degree $2d$ can be written as a quadratic form in these monomials:
+\begin{equation}
+    p(x) = \mathbf{v}_d(x)^T Q \mathbf{v}_d(x) = \sum_{i=1}^N \sum_{j=1}^N Q_{ij} v_i(x) v_j(x)
+    \label{eq:gram_rep}
+\end{equation}
+where $Q \in \mathbb{R}^{N \times N}$ is a symmetric matrix, referred to as the Gram matrix of $p(x)$.
+
+Crucially, this representation is not unique. Different matrices $Q$ can yield the same polynomial $p(x)$ because different products of monomials can result in the same term (e.g., $x_1 \cdot x_1 = x_1^2$, but $1 \cdot x_1^2$ is also $x_1^2$). The set of Gram matrices that represent a specific $p(x)$ forms an affine subspace of the space of symmetric matrices.
+
+\subsection{Semidefinite Programming Formulation}
+
+The connection between SOS polynomials and SDP is established by the following core theorem, which provides a completely tractable characterization of $\Sigma_{n,2d}$.
+
+\begin{theorem}[SOS-SDP Equivalence]
+A polynomial $p(x) \in \mathbb{R}[x]_{2d}$ is a sum of squares if and only if there exists a symmetric positive semidefinite matrix $Q \succeq 0$ such that $p(x) = \mathbf{v}_d(x)^T Q \mathbf{v}_d(x)$.
+\end{theorem}
+
+This theorem allows us to pose the membership problem $p(x) \in \Sigma_{n,2d}$ as a semidefinite feasibility problem:
+\begin{align*}
+    \text{Find } & Q \in \mathbb{S}^N \\
+    \text{subject to } & Q \succeq 0 \\
+                       & \mathbf{v}_d(x)^T Q \mathbf{v}_d(x) = p(x) \quad (\text{coefficient matching})
+\end{align*}
+The equality constraint $\mathbf{v}_d(x)^T Q \mathbf{v}_d(x) = p(x)$ is equivalent to a set of linear equality constraints on the entries $Q_{ij}$. Specifically, if $p(x) = \sum_\alpha c_\alpha x^\alpha$, we require:
+$$ \sum_{i,j : v_i(x)v_j(x) = x^\alpha} Q_{ij} = c_\alpha \quad \forall \alpha $$
+This is precisely the standard form of an SDP feasibility problem.
+
+\subsection{Explicit SOS Construction via Matrix Factorization}
+
+If a Gram matrix $Q \succeq 0$ is found, we can explicitly construct the polynomials $h_i(x)$ that comprise the sum of squares. This relies on the fact that any positive semidefinite matrix admits a factorization of the form $Q = L^T L$ (or similar decompositions like Cholesky or spectral).
+
+Let $Q \succeq 0$ have rank $r$. We can perform a spectral decomposition:
+$$ Q = \sum_{i=1}^r \lambda_i \mathbf{u}_i \mathbf{u}_i^T $$
+where $\lambda_i > 0$ are the non-zero eigenvalues and $\mathbf{u}_i \in \mathbb{R}^N$ are the corresponding eigenvectors.
+
+Substituting this back into the Gram representation:
+\begin{align*}
+    p(x) &= \mathbf{v}_d(x)^T \left( \sum_{i=1}^r \lambda_i \mathbf{u}_i \mathbf{u}_i^T \right) \mathbf{v}_d(x) \\
+         &= \sum_{i=1}^r \lambda_i \left( \mathbf{v}_d(x)^T \mathbf{u}_i \right) \left( \mathbf{u}_i^T \mathbf{v}_d(x) \right) \\
+         &= \sum_{i=1}^r \left( \sqrt{\lambda_i} \mathbf{u}_i^T \mathbf{v}_d(x) \right)^2
+\end{align*}
+By defining the polynomials $h_i(x) = \sqrt{\lambda_i} \mathbf{u}_i^T \mathbf{v}_d(x)$, we arrive at the explicit SOS decomposition:
+$$ p(x) = \sum_{i=1}^r h_i(x)^2 $$
+The vector $\mathbf{u}_i$ serves precisely as the coefficient vector for the polynomial $h_i(x)$ in the basis $\mathbf{v}_d(x)$.
+
+\begin{remark}
+While spectral decomposition is theoretically clean, in practice, a Cholesky decomposition $Q = L^T L$ (if $Q \succ 0$) or an $LDL^T$ decomposition is often used numerically. If $Q = L^T L$, with rows of $L$ denoted by $\mathbf{\ell}_i$, then $h_i(x) = \mathbf{\ell}_i \cdot \mathbf{v}_d(x)$.
+\end{remark}
+
+\subsection{Example}
+Consider the univariate polynomial $p(x) = 2x^4 + 2x^2 + 5$. Here $n=1, 2d=4$, so we use the basis $\mathbf{v}_2(x) = [x^2, x, 1]^T$.
+We seek $Q \in \mathbb{S}^3$ such that:
+$$ 2x^4 + 2x^2 + 5 = \begin{bmatrix} x^2 \\ x \\ 1 \end{bmatrix}^T \begin{bmatrix} q_{11} & q_{12} & q_{13} \\ q_{12} & q_{22} & q_{23} \\ q_{13} & q_{23} & q_{33} \end{bmatrix} \begin{bmatrix} x^2 \\ x \\ 1 \end{bmatrix} $$
+Expanding the right side yields $q_{11}x^4 + 2q_{12}x^3 + (2q_{13} + q_{22})x^2 + 2q_{23}x + q_{33}$.
+Matching coefficients provides the linear constraints:
+\begin{align*}
+    q_{11} &= 2 \\
+    2q_{12} &= 0 \implies q_{12} = 0 \\
+    2q_{13} + q_{22} &= 2 \\
+    2q_{23} &= 0 \implies q_{23} = 0 \\
+    q_{33} &= 5
+\end{align*}
+A feasible solution is $q_{13} = 0, q_{22} = 2$, giving the diagonal matrix $Q = \text{diag}(2, 2, 5)$. Since all diagonal entries are positive, $Q \succeq 0$.
+The decomposition is immediate:
+$$ p(x) = (\sqrt{2}x^2)^2 + (\sqrt{2}x)^2 + (\sqrt{5})^2 $$
+demonstrating $p(x) \in \Sigma_{1,4}$.
+
+% =====================================================================
+% END OF DROP-IN SECTION
+% =====================================================================
+
+\end{document}

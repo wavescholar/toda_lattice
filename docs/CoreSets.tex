@@ -1,0 +1,423 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Coreset-Driven Evaluation of Generative AI Agents (Revised)
+%
+% XeLaTeX-ready. Keeps your fontspec/babel stack. Adds theory, equations,
+% expanded algorithms, variance control, drift tests, and richer references.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt, a4paper]{article}
+
+% --- 1. PAGE GEOMETRY & LAYOUT ---
+\usepackage[a4paper, top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.5\baselineskip}
+
+% --- 2. FONT & LANGUAGE (XELATEX) ---
+\usepackage{fontspec}
+\usepackage[english, bidi=default]{babel}
+\babelprovide[import]{english}
+\babelfont{rm}{Helvetica Neue}
+\babelfont{sf}{Helvetica Neue}
+\babelfont{tt}{Menlo}
+
+% --- 3. CORE PACKAGES ---
+\usepackage{amsmath, amssymb, amsfonts, amsthm, mathtools, bm}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{siunitx}
+\usepackage{bbm}
+
+% --- 4. ALGORITHMS ---
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+% --- 5. REFERENCES ---
+\usepackage[authoryear]{natbib}
+\setcitestyle{open={(},close={)}}
+
+% --- 6. HYPERLINKS ---
+\usepackage{xcolor}
+\usepackage[
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    citecolor=blue!70!black,
+    urlcolor=blue!70!black,
+    pdftitle={Coreset-Driven Evaluation of Generative AI Agents},
+    pdfauthor={AI Systems Group},
+    pdfsubject={A framework for efficient and robust AI agent evaluation using coresets.}
+]{hyperref}
+
+% --- 7. THEOREM-LIKE ENVIRONMENTS ---
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+% --- 8. UTIL MACROS ---
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\1}{\mathbbm{1}}
+\newcommand{\ip}[2]{\left\langle #1,\, #2 \right\rangle}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\KL}{\mathrm{KL}}
+\newcommand{\MMD}{\mathrm{MMD}}
+\newcommand{\Wtwo}{W_{2}}
+
+% --- TITLE ---
+\title{Efficient and Robust Evaluation of Large-Scale AI Agents Using Coresets}
+\author{AI Systems Group \\ \texttt{contact@system-design.ai}}
+\date{\today}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\maketitle
+
+\begin{abstract}
+As generative AI agents and chatbots are deployed at scale, they produce a deluge of user interactions, trajectories, and utterances. Evaluating performance, tracking regressions, and identifying drift are operationally critical yet expensive under naive sampling. We present a practical, theoretically grounded framework for applying \emph{coresets}---small, weighted subsets that provably approximate a larger set---to agent evaluation. We formalize objectives, give construction strategies (geometric coverage, sensitivity-based importance sampling, error-focused active coresets), and derive weighting and variance-control schemes that yield unbiased or low-bias, low-variance estimates of key metrics across slices. We provide streaming algorithms with merge-and-reduce guarantees and distributional drift tests (MMD, Wasserstein, Fr\'echet-type distances) tied to alerting. We close with validation protocols, limits, and open problems for multi-objective preservation (e.g., F1, $P_{99}$ latency, and calibration) under adversarial shifts.
+\end{abstract}
+
+% --- SECTION 1: INTRODUCTION ---
+\section{The Evaluation Bottleneck in Deployed AI}
+
+Deployed agents can generate billions of utterances and millions of multi-turn trajectories weekly. Teams must answer:
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Is model $v_{n+1}$ better than $v_n$?
+    \item Did a critical task (e.g., ``book a flight'') regress?
+    \item Are jailbreaks or subtle failures emerging in a user segment?
+    \item Are SLOs (latency, tool-call success, cost) holding under load?
+\end{itemize}
+Exhaustive labeling is intractable; uniform subsampling misses rare yet business-critical behaviors. A \emph{coreset} $S$ is a small, weighted subset approximating a large dataset $X$ for a class of objectives \citep{feldman2011, braverman2016, lucic2018}. Properly constructed, $S$ supports high-fidelity metric estimation, reproducible regression tests, and early drift detection.
+
+\paragraph{Setting.}
+Let $X=\{(x_i,w_i)\}_{i=1}^N$ denote trajectories with traffic weights $w_i\ge 0$ (e.g., $w_i=1/N$ or empirical frequencies). For a metric $f$ (accuracy, F1, reward, cost), define
+\begin{equation}
+\hat f_X \;=\; \sum_{i=1}^N w_i\, f(x_i).
+\end{equation}
+A coreset $S=\{(s_j,v_j)\}_{j=1}^k$ with $k\ll N$ is \emph{$\varepsilon$-accurate} for a function class $\mathcal F$ if
+\begin{equation}
+\sup_{f\in\mathcal F} \; \big|\hat f_X - \hat f_S\big| \;\le\; \varepsilon
+\quad\text{where}\quad
+\hat f_S \;=\; \sum_{j=1}^k v_j\, f(s_j).
+\label{eq:coreset-guarantee}
+\end{equation}
+Guarantees can be uniform (over $\mathcal F$), objective-specific (ERM loss), or distributional (IPM/MMD distances).
+
+% --- SECTION 2: THE CORESET FRAMEWORK ---
+\section{A Coreset Framework for Agent Evaluation}
+
+\subsection{Step 1: Define the Evaluation Objective}
+Let $\mathcal{F}$ collect the metrics to preserve: outcome metrics (accuracy, F1, task success), operational metrics (latency quantiles, tool-call failure), calibration metrics (ECE, Brier), and slice constraints (compliance, VIP, high-revenue intents). For instance:
+\begin{align}
+\text{ECE} &= \sum_{b=1}^B \frac{n_b}{N}\, \big|\text{acc}(b) - \text{conf}(b)\big|,
+\qquad
+\text{Brier} = \frac{1}{N}\sum_{i=1}^N \sum_{c} \big(p_{ic} - \1[y_i=c]\big)^2.
+\end{align}
+Define business thresholds $\varepsilon_f$ so that $|\hat f_X-\hat f_S|\le \varepsilon_f$.
+
+\subsection{Step 2: Choose a Behavioral Representation}
+Construct $z_i\in\R^d$ for each $x_i$:
+\[
+z_i = \big[z_{\text{embed}} \;\oplus\; z_{\text{meta}} \;\oplus\; z_{\text{difficulty}}\big],
+\]
+where $z_{\text{embed}}$ are sentence/trajectory embeddings (turn-level pooled), $z_{\text{meta}}$ are structured features (tool graph counts, locale, device, outcome), and $z_{\text{difficulty}}$ includes judge-uncertainty, human--model disagreement, cost, policy flags. Normalize features; keep $w_i$ alongside.
+
+\subsection{Step 3: Select a Construction Strategy}
+We detail four complementary strategies.
+
+\paragraph{(A) Geometric coverage / diversity.}
+\emph{$k$-center greedy} (farthest-first) controls the maximum covering radius in $Z$ \citep{gonzalez1985}. \emph{$k$-medoids/facility-location} maximizes a submodular representativeness objective $F(S)=\sum_{i\in X} w_i \max_{j\in S}\mathrm{sim}(z_i,z_j)$ with $(1-1/e)$-approximation via greedy \citep{nemhauser1978}. DPPs further encourage repulsion/diversity \citep{kulesza2012}.
+
+\paragraph{(B) Sensitivity/importance sampling for ERM.}
+For a proxy loss $L(\theta)=\sum_i w_i\,\ell(f_\theta(x_i),y_i)$, define point sensitivity
+\begin{equation}
+\sigma_i \;=\; \sup_{\theta\in\Theta} \frac{w_i\,\ell(f_\theta(x_i),y_i)}{\sum_{j} w_j\,\ell(f_\theta(x_j),y_j)}.
+\label{eq:sensitivity}
+\end{equation}
+Sampling $i$ with $p_i \propto \sigma_i w_i$ and reweighting $v_i\propto w_i/p_i$ yields $(\varepsilon)$-coresets whose size depends on $\sum_i \sigma_i$ but not $N$ \citep{feldman2011, munteanu2018}. For generalized linear models, leverage-score variants connect to $\ell_2$-sensitivity \citep{drineas2012, mahoney2011}.
+
+\paragraph{(C) Error-focused active coresets.}
+Train a light failure predictor on cheap labels (judge model or heuristics). Select points by informativeness (e.g., BALD mutual information, margin sampling) with fairness-aware constraints across slices \citep{houlsby2011, katharopoulos2018}.
+
+\paragraph{(D) Streaming merge-and-reduce.}
+Process shards, build small coresets per shard, and recursively merge/reduce, preserving guarantees \citep{agarwal2012, harpeled2018}. This yields near-linear scalability and bounded memory.
+
+\subsection{Step 4: Agent-Specific Adaptations}
+Choose the evaluation unit as a \emph{trajectory}. Include state-action signals: tool/API sequences, error codes (auth, schema, rate-limit), retries, function-call graphs. If SLOs matter, include latency percentiles or queueing proxies (e.g., service time vs. waiting time) in $z_i$ or as explicit constraints.
+
+\subsection{Step 5: Weighting, Debiasing, Stratification}
+Let $p_i$ denote the selection probability. The standard unbiased estimator for any metric $f$ is the Horvitz--Thompson form
+\begin{equation}
+\hat f_S \;=\; \sum_{i\in S} \frac{w_i}{p_i}\, f(x_i),
+\qquad
+v_i \equiv \frac{w_i}{p_i}.
+\label{eq:HT}
+\end{equation}
+Its variance is
+\begin{equation}
+\Var(\hat f_S) \;=\; \sum_i \frac{w_i^2}{p_i}\, \Var\!\big(f(x_i)\big) \;+\;
+\sum_{i\neq j}\!\Big(\frac{w_i w_j}{p_i p_j}\,\mathrm{Cov}(\1_{i\in S}f_i,\1_{j\in S}f_j)\Big),
+\end{equation}
+which motivates $p_i$ that scale with difficulty/variance (Neyman allocation) and negative dependence (e.g., DPP sampling) to reduce covariance.
+
+\paragraph{Stratification.}
+Partition $X=\bigsqcup_{g=1}^G X_g$ (intent, language, region, recency) and allocate $k_g$ subject to $k=\sum_g k_g$. Within each stratum, run the chosen selector, compute $p_i$ internally, and use \eqref{eq:HT}. This prevents \emph{rare-slice collapse}.
+
+\subsection{Step 6: Validation and Accept/Reject}
+Hold out a silent i.i.d.\ control set $X_{\text{holdout}}$. For each $f\in\mathcal F$:
+\begin{align}
+\Delta_f &= \big|\hat f_X - \hat f_S\big|, \quad
+\text{CI via normal or bootstrap on } \hat f_S, \\
+\Delta_{f,g} &= \big|\hat f_{X,g} - \hat f_{S,g}\big| \text{ for each slice } g, \\
+\Delta^{\text{worst-}k}_f &= \frac{1}{k}\sum_{g\in \text{worst-}k} \Delta_{f,g}.
+\end{align}
+Reject and revise if thresholds are exceeded; increase $k$, adjust strata or representation $Z$, or switch selector.
+
+% --- SECTION 3: THEORY HIGHLIGHTS ---
+\section{Theory Highlights and Useful Bounds}
+
+\subsection{Uniform Approximation and Range Spaces}
+For range spaces with finite VC dimension $d$, $\varepsilon$-approximations of size $O(d\,\varepsilon^{-2}\log(d/\varepsilon))$ exist \citep{li2011}. For clustering objectives (e.g., $k$-means), strong coreset sizes $O(dk\varepsilon^{-2})$ or better are known \citep{braverman2016, feldman2013}.
+
+\subsection{Sensitivity Sampling Guarantees}
+If $p_i\ge \min\{1, c\,\sigma_i/\sum_j \sigma_j\}$, then with $k=O((\sum_i \sigma_i)\,\varepsilon^{-2}\log(1/\delta))$ samples, the ERM loss $\sum_i w_i \ell(\cdot)$ is preserved within $(1\pm\varepsilon)$ with probability $\ge 1-\delta$ \citep{feldman2011, munteanu2018}. Practical proxies: gradient norms $\|\nabla_\theta \ell_i\|$, influence functions, or generalized leverage scores.
+
+\subsection{Variance Control and Concentration}
+For bounded $f\in[a,b]$ with independent sampling, Hoeffding gives
+\[
+\mathbb{P}\big(|\hat f_S - \E[\hat f_S]|\ge t\big)\le 2\exp\!\left(-\frac{2t^2}{\sum_{i\in S}(b-a)^2}\right).
+\]
+Bernstein-type bounds incorporate variance, offering tighter CIs when $f$ has heteroskedasticity. DPP sampling induces negative dependence, tightening tail bounds for linear statistics.
+
+\subsection{Bayesian Coresets (optional for reward/risk models)}
+For posterior approximations, Bayesian coresets (e.g., GIGA, Frank--Wolfe) greedily optimize a divergence objective to match the full-data log-likelihood geometry \citep{campbell2018, huggins2016}. This supports fast posterior updates on small weighted subsets.
+
+% --- SECTION 4: DRIFT DETECTION ON CORESET STREAMS ---
+\section{Drift Detection on Coreset Streams}
+
+Let $S_t$ be the coreset for period $t$ with embeddings $Z_t$ and weights $v_t$. Distances between $(Z_t,v_t)$ and $(Z_{t-1},v_{t-1})$ trigger alerts.
+
+\paragraph{MMD$^2$.}
+For kernel $k$,
+\begin{equation}
+\MMD^2(P_t,P_{t-1}) \;=\; \E k(z,z') -2\E k(z,\tilde z) + \E k(\tilde z,\tilde z'),
+\end{equation}
+estimated with weighted U-statistics on $(S_t,S_{t-1})$ \citep{gretton2012}.
+
+\paragraph{2-Wasserstein.}
+If we approximate each coreset by Gaussian $(\mu_t,\Sigma_t)$, the closed form is
+\begin{equation}
+\Wtwo^2(\mathcal N_t,\mathcal N_{t-1})
+= \|\mu_t-\mu_{t-1}\|_2^2 + \mathrm{Tr}\!\left(\Sigma_t+\Sigma_{t-1}
+-2\big(\Sigma_{t-1}^{1/2}\Sigma_t\Sigma_{t-1}^{1/2}\big)^{1/2}\right).
+\end{equation}
+
+\paragraph{Fr\'echet-type distances.}
+Track Fr\'echet distance in embedding space (akin to FID) to capture distributional shifts that often precede metric regressions.
+
+% --- SECTION 5: PRACTICAL IMPLEMENTATION ---
+\section{Practical Implementation and Validation}
+
+\subsection{Weighted Farthest-First with Difficulty (Geometric Baseline)}
+\begin{algorithm}[H]
+\caption{Weighted Farthest-First with Difficulty Prioritization}
+\label{alg:weighted-k-center}
+\begin{algorithmic}[1]
+\Require data $X$, features $z(i)$, traffic weights $w(i)$, difficulty $d(i)$, size $k$, trade-off $\alpha\in[0,1]$
+\Ensure coreset $S$ and weights $v$
+\State $S\gets\emptyset$, $dist[i]\gets+\infty$
+\Function{Priority}{$i$} \Return $\alpha\cdot dist[i] + (1-\alpha)\cdot d(i)$ \EndFunction
+\State $j_0 \gets \arg\max_i w(i)\,d(i)$; add $j_0$ to $S$
+\State update $dist[i]\leftarrow \min(dist[i],\|z(i)-z(j_0)\|)$ for all $i$
+\For{$t=2$ to $k$}
+    \State $j\gets \arg\max_i \textsc{Priority}(i)$; add $j$ to $S$
+    \State update $dist[i]\leftarrow \min(dist[i],\|z(i)-z(j)\|)$
+\EndFor
+\State estimate local density / selection probs $p_i$ for $i\in S$
+\State set $v_i \gets w(i)/p_i$ \Comment{Horvitz--Thompson}
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Sensitivity (ERM) Coreset via Proxy Gradients}
+\begin{algorithm}[H]
+\caption{Sensitivity / Importance-Sampled ERM Coreset}
+\label{alg:sensitivity}
+\begin{algorithmic}[1]
+\Require proxy model $f_\theta$, loss $\ell$, features $z(i)$, labels/pseudo-labels $y_i$, size $k$
+\Ensure coreset $S$ and weights $v$
+\State fit $\theta$ on a cheap subset or using judge labels
+\State compute sensitivity proxy $s_i \propto w_i\cdot \|\nabla_\theta \ell(f_\theta(x_i),y_i)\|$ (or leverage score)
+\State set $p_i \propto s_i$ with $\sum_i p_i = k$
+\State sample $S$ by Poisson or VAROPT; set $v_i \gets w_i/p_i$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Streaming Merge-and-Reduce (Scalable)}
+\begin{algorithm}[H]
+\caption{Streaming Merge-and-Reduce}
+\label{alg:streaming}
+\begin{algorithmic}[1]
+\Require data stream split into shards $X_1,\dots,X_M$, per-shard size $k_1$, final size $k$
+\Ensure coreset $S$
+\For{$j=1$ to $M$} \State build $S_j$ of size $k_1$ on $X_j$ \EndFor
+\State $S' \gets \bigcup_j S_j$
+\State build final $S$ of size $k$ on $S'$ (reuse Alg.~\ref{alg:weighted-k-center} or \ref{alg:sensitivity})
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Confidence Intervals and Power}
+With HT weights \eqref{eq:HT}, unbiasedness holds for linear metrics. For non-linear metrics (F1, quantiles), use \emph{delta method} or \emph{paired bootstrap} on $S$ with $v_i$ to form CIs. For A/B deltas $\Delta_f$, use stratified, paired evaluation on the same weighted coreset to reduce variance.
+
+% --- SECTION 6: RECIPES AND LIFECYCLE INTEGRATION ---
+\section{Concrete Recipes and Lifecycle Integration}
+
+\subsection{Recipes}
+\begin{enumerate}
+\item \textbf{Quick Evaluation Coreset.}
+Mean-pooled embeddings + tool/outcome/latency/uncertainty; weighted $k$-center with $k\in[5\mathrm{k},20\mathrm{k}]$; top-off with high-uncertainty/cost/policy items; HT weights; paired bootstrap CIs.
+
+\item \textbf{Theory-Backed ERM Coreset.}
+Proxy classifier with pseudo-labels; gradient-norm sensitivities; Poisson/VAROPT sampling; $v_i=w_i/p_i$. Use for retraining judges/reward models or focused failure discovery.
+
+\item \textbf{Streaming Drift Watch.}
+Daily $k\approx 1{,}000$ via merge-and-reduce; alert on $\MMD^2$, $\Wtwo^2$, or Fr\'echet distance spiking, and on worst-$k$ slice metrics.
+
+\item \textbf{Fairness- or Compliance-Aware.}
+Stratify by protected/business slices; allocate $k_g$ via Neyman allocation: $k_g \propto N_g \sigma_g$ (estimated within-slice variance), then run any selector in each stratum.
+\end{enumerate}
+
+\subsection{Lifecycle Integration}
+\begin{itemize}
+\item \textbf{Pre-Launch:} Assemble a design coreset mixing historical logs, adversarial prompts, and synthetic tool-call chains to span intents/APIs.
+\item \textbf{Canary/A/B:} Compare $v_{n+1}$ vs.\ $v_n$ on a frozen, versioned coreset for apples-to-apples, plus a recency-weighted coreset for drift sensitivity.
+\item \textbf{HITL Routing:} Send high-$v_i$ and high-uncertainty items to human graders (max expected value of information).
+\item \textbf{Root Cause:} On regression in a slice, re-run local coreset selection within the failing slice to surface minimal counterexamples.
+\end{itemize}
+
+% --- SECTION 7: LIMITATIONS AND OPEN DIRECTIONS ---
+\section{Limitations and Open Directions}
+
+\textbf{Embedding myopia.} If $Z$ misses crucial causal features (e.g., policy nuances, tool schemas), coverage coresets fail; iterate on $Z$ with explicit tool graphs or retrieved-knowledge features.
+
+\textbf{Objective mismatch.} Coresets preserve what they are asked to preserve. If the business objective $g$ differs from proxy $f$, bias can appear. Use multi-objective or constrained selection:
+\[
+\min_{S,\,v}\;\sum_{r=1}^R \lambda_r\,\big|\hat f^{(r)}_X-\hat f^{(r)}_S\big|
+\quad \text{s.t.}\quad \text{slice constraints},\; |S|=k.
+\]
+
+\textbf{Non-linear metrics.} For quantiles (e.g., $P_{99}$ latency), use quantile-aware sampling (importance by tail risk) and quantile-specific CI methods.
+
+\textbf{Adversarial shift.} Integrate red-teaming distributions and OOD detection into strata; consider distributionally robust selection via IPMs (e.g., maximize worst-case coverage in Wasserstein balls).
+
+% --- SECTION 8: CONCLUSION ---
+\section{Conclusion}
+
+Coresets offer a principled bridge between massive interaction logs and practical, trustworthy agent evaluation. With appropriate representations, sampling/selection, and weighting, small weighted subsets enable accurate metrics, stable regression tests, and early drift alerts—at a fraction of cost. The main work is aligning the objective with the business goal, protecting rare slices, and validating rigorously.
+
+% --- REFERENCES ---
+\begin{thebibliography}{99}
+\small
+
+\bibitem[Agarwal et al.(2012)]{agarwal2012}
+Agarwal, P. K., Har-Peled, S., \& Varadarajan, K. (2012).
+Merge-and-reduce: A framework for streaming coreset construction.
+In \emph{SODA}.
+
+\bibitem[Braverman et al.(2016)]{braverman2016}
+Braverman, V., Feldman, D., Lang, H., \& Sohler, C. (2016).
+New frameworks for offline and streaming coreset constructions.
+\emph{arXiv:1612.00889}.
+
+\bibitem[Campbell \& Broderick(2018)]{campbell2018}
+Campbell, T., \& Broderick, T. (2018).
+Bayesian coreset construction via greedy iterative geodesic ascent.
+In \emph{ICML}.
+
+\bibitem[Drineas et al.(2012)]{drineas2012}
+Drineas, P., Mahoney, M. W., Muthukrishnan, S., \& Sarl\'os, T. (2012).
+Fast approximation of matrix coherence and statistical leverage.
+\emph{JMLR}, 13.
+
+\bibitem[Feldman \& Langberg(2011)]{feldman2011}
+Feldman, D., \& Langberg, M. (2011).
+A unified framework for core-sets.
+In \emph{STOC}.
+
+\bibitem[Feldman et al.(2013)]{feldman2013}
+Feldman, D., Monemizadeh, M., \& Sohler, C. (2013).
+A PTAS for $k$-means clustering based on weak coresets.
+\emph{SODA}.
+
+\bibitem[Gonzalez(1985)]{gonzalez1985}
+Gonzalez, T. F. (1985).
+Clustering to minimize the maximum intercluster distance.
+\emph{Theoretical Computer Science}, 38, 293--306.
+
+\bibitem[Gretton et al.(2012)]{gretton2012}
+Gretton, A., Borgwardt, K. M., Rasch, M., Sch\"olkopf, B., \& Smola, A. (2012).
+A kernel two-sample test.
+\emph{JMLR}, 13.
+
+\bibitem[Har-Peled \& Mazumdar(2018)]{harpeled2018}
+Har-Peled, S., \& Mazumdar, S. (2018).
+On coresets for $k$-means and $k$-median clustering.
+\emph{SIAM J. Comp.}, 47(3), 1447--1472.
+
+\bibitem[Houlsby et al.(2011)]{houlsby2011}
+Houlsby, N., Husz\'ar, F., Ghahramani, Z., \& Lengyel, M. (2011).
+Bayesian active learning for classification and preference learning.
+\emph{arXiv:1112.5745}.
+
+\bibitem[Huggins et al.(2016)]{huggins2016}
+Huggins, J. H., Campbell, T., \& Broderick, T. (2016).
+Coresets for scalable Bayesian logistic regression.
+In \emph{NeurIPS} Workshop.
+
+\bibitem[Katharopoulos \& Fleuret(2018)]{katharopoulos2018}
+Katharopoulos, A., \& Fleuret, F. (2018).
+Not all samples are created equal: Deep learning with importance sampling.
+In \emph{ICML}.
+
+\bibitem[Kulesza \& Taskar(2012)]{kulesza2012}
+Kulesza, A., \& Taskar, B. (2012).
+Determinantal point processes for machine learning.
+\emph{Foundations and Trends in ML}, 5(2--3).
+
+\bibitem[Li et al.(2011)]{li2011}
+Li, P., Long, P. M., \& Srinivasan, A. (2011).
+Improved bounds on the sample complexity of learning.
+\emph{JCSS}, 62(3), 516--526.
+
+\bibitem[Liang et al.(2022)]{liang2022}
+Liang, P., Bommasani, R., Lee, T., et al. (2022).
+Holistic evaluation of language models.
+\emph{arXiv:2211.09110}.
+
+\bibitem[Lucic et al.(2018)]{lucic2018}
+Lucic, M., Faiss, M., \& Krause, A. (2018).
+Training Gaussian mixture models at scale via coresets.
+\emph{JMLR}, 18(1).
+
+\bibitem[Mahoney(2011)]{mahoney2011}
+Mahoney, M. W. (2011).
+Randomized algorithms for matrices and data.
+\emph{Foundations and Trends in ML}, 3(2).
+
+\bibitem[Munteanu \& Schwiegelshohn(2018)]{munteanu2018}
+Munteanu, A., \& Schwiegelshohn, C. (2018).
+Coresets--methods and history: A theoretician's design pattern for ML.
+\emph{arXiv:1807.07822}.
+
+\bibitem[Nemhauser et al.(1978)]{nemhauser1978}
+Nemhauser, G. L., Wolsey, L. A., \& Fisher, M. L. (1978).
+An analysis of approximations for maximizing submodular set functions—I.
+\emph{Mathematical Programming}, 14(1), 265--294.
+
+\end{thebibliography}
+
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

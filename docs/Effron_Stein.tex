@@ -1,0 +1,312 @@
+% !TEX TS-program = xelatex
+\documentclass[12pt, letterpaper]{article}
+
+% ---------- Shared document settings ----------
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+% ---------- Additional utilities ----------
+\usepackage{microtype}
+\usepackage{mathtools}
+\usepackage{bbm}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage[nameinlink]{cleveref}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!55!black,
+  citecolor=blue!55!black,
+  urlcolor=blue!55!black,
+  pdfauthor={},
+  pdftitle={Efron--Stein, Jackknife, and Bootstrap: A Short Note},
+  pdfcreator={}
+}
+
+% ---------- Theorems & macros ----------
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\1}{\mathbbm{1}}
+
+% ---------- Title ----------
+\title{Efron--Stein, Jackknife, and Bootstrap: \\ Sensitivity, Variance, and Resampling}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This short note collects the Efron--Stein inequality with intuition and two proofs (martingale and conditional-variance forms), then connects it to the jackknife, infinitesimal jackknife, delete-$m$ jackknife, and bootstrap. Several worked examples show how the \emph{leave-one-coordinate} perturbations control variance and how resampling-based estimators approximate the same sensitivity in practice.
+\end{abstract}
+
+\section{Setup and Statement}
+
+Let $X_1,\dots,X_n$ be independent random variables on a common probability space, and let $Z=f(X_1,\dots,X_n)$ be square-integrable. Let $X_1',\dots,X_n'$ be an independent copy, and define
+\[
+  Z^{(i)} \;=\; f(X_1,\dots,X_{i-1},X_i',X_{i+1},\dots,X_n).
+\]
+\begin{theorem}[Efron--Stein]
+\label{thm:ES}
+For $Z=f(X_1,\dots,X_n)$ as above,
+\[
+  \Var(Z) \;\le\; \tfrac12\sum_{i=1}^n \E\big[(Z-Z^{(i)})^2\big].
+\]
+Equivalently,
+\[
+  \Var(Z)\;\le\;\sum_{i=1}^n \E\!\left[\Var\!\big(Z\mid X_{-i}\big)\right],
+\quad\text{where }X_{-i}=(X_1,\dots,X_{i-1},X_{i+1},\dots,X_n).
+\]
+\end{theorem}
+
+\paragraph{Interpretation.}
+The difference $Z-Z^{(i)}$ is a \emph{leave-one-coordinate redraw}: it measures how much the statistic changes when we keep all inputs fixed except we resample $X_i$ from its own law. Squaring and averaging gives the average \emph{influence} of coordinate $i$; the inequality says that the sum of these influences (up to a factor $1/2$) controls the variance.
+
+\section{Two Short Proofs}
+
+\subsection{Martingale (Doob) proof}
+Let $M_i=\E[Z\mid X_1,\dots,X_i]$ be the Doob martingale with $M_0=\E Z$ and $M_n=Z$. The orthogonality of martingale differences gives
+\[
+  \Var(Z)=\sum_{i=1}^n \E\big[(M_i-M_{i-1})^2\big].
+\]
+Introduce $X_i'$ (an i.i.d.\ copy) and set $Z^{(i)}$ accordingly. By the usual symmetrization (swap $X_i$ and $X_i'$ conditioned on the rest),
+\[
+  \E\big[(M_i-M_{i-1})^2\big]\;\le\;\tfrac12\,\E\big[(Z-Z^{(i)})^2\big].
+\]
+Summing over $i$ yields \Cref{thm:ES}.
+
+\subsection{Conditional-variance proof}
+Using the law of total variance iteratively,
+\[
+  \Var(Z)=\sum_{i=1}^n \E\!\left[\Var\!\big(Z\mid X_1,\dots,X_i\big)-\Var\!\big(Z\mid X_1,\dots,X_{i-1}\big)\right]
+  =\sum_{i=1}^n \E\!\left[\Var\!\big(Z\mid X_{-i}\big)\right].
+\]
+Finally, note that
+\[
+  2\,\Var\!\big(Z\mid X_{-i}\big)
+  = \E\!\big[(Z-Z^{(i)})^2\mid X_{-i}\big],
+\]
+and take expectations.
+
+\section{Corollaries and Quick Tools}
+
+\begin{corollary}[Bounded differences $\Rightarrow$ variance bound]
+If for each $i$, changing only $X_i$ changes $f$ by at most $c_i$ (i.e.\ $|f(x)-f(x^{(i)})|\le c_i$), then
+\[
+  \Var(Z)\le \tfrac12 \sum_{i=1}^n c_i^2.
+\]
+\end{corollary}
+
+\begin{remark}[Tightness]
+For linear $f$ (e.g.\ sample mean), Efron--Stein is tight (equality). For nonlinear $f$ (max, median, thresholds), it remains informative but can be loose.
+\end{remark}
+
+\section{Worked Examples}
+
+\begin{example}[Sample mean: equality]
+Let $Z=\bar X=\frac1n\sum_{i=1}^n X_i$ with $\Var(X_i)=\sigma^2$. Then
+\[
+  Z-Z^{(i)}=\frac{X_i-X_i'}{n},\qquad
+  \E\big[(Z-Z^{(i)})^2\big]=\frac{2\sigma^2}{n^2}.
+\]
+Hence
+\[
+  \tfrac12\sum_{i=1}^n \E\big[(Z-Z^{(i)})^2\big]
+  =\tfrac12\cdot n\cdot \frac{2\sigma^2}{n^2}
+  =\frac{\sigma^2}{n}
+  =\Var(\bar X).
+\]
+\end{example}
+
+\begin{example}[Maximum of two Bernoulli variables]
+Let $X_1,X_2\sim\mathrm{Bernoulli}(p)$ i.i.d., and $Z=\max\{X_1,X_2\}$. Then $Z\sim\mathrm{Bernoulli}(2p-p^2)$ so
+\[
+  \Var(Z)=(2p-p^2)\,(1-2p+p^2).
+\]
+For the RHS of Efron--Stein:
+\[
+  \E\big[(Z-Z^{(1)})^2\big]=\mathbb{P}(X_2=0)\,\mathbb{P}(X_1\ne X_1')= (1-p)\cdot 2p(1-p)=2p(1-p)^2,
+\]
+and by symmetry the same for $i=2$. Thus
+\[
+  \tfrac12\sum_{i=1}^2 \E\big[(Z-Z^{(i)})^2\big] = 2p(1-p)^2.
+\]
+At $p=\tfrac12$, the bound gives $0.25$ whereas $\Var(Z)=0.1875$; the bound holds but is not tight.
+\end{example}
+
+\begin{example}[Median: asymptotics and sensitivity]
+Let $\tilde X_n$ be the sample median of i.i.d.\ data with continuous cdf $F$ and density $f$ positive at the population median $m=F^{-1}(1/2)$. Then
+\[
+  \sqrt{n}\,(\tilde X_n-m)\ \xrightarrow{d}\ \mathcal{N}\!\left(0,\ \frac{1}{4 f(m)^2}\right),
+\]
+so $\Var(\tilde X_n)\approx \frac{1}{4 n f(m)^2}$. In terms of Efron--Stein, the terms $(\tilde X_n-\tilde X_n^{(i)})^2$ are usually $0$ unless $X_i$ is near the order statistics that determine the median, explaining looseness of the ES upper bound for this nonsmooth statistic.
+\end{example}
+
+\begin{example}[U-statistic (sketch)]
+For a symmetric kernel $h$ of order $m$, the U-statistic $U=\binom{n}{m}^{-1}\sum h(X_{i_1},\dots,X_{i_m})$ has Hoeffding decomposition $U=\theta+\sum_i \phi(X_i)+\text{deg}\ge2$. Efron--Stein bounds $\Var(U)$ by the average squared change when one coordinate is redrawn; for many kernels this recovers the classical $O(1/n)$ variance rate and can be surprisingly sharp when the linear component dominates.
+\end{example}
+
+\section{Jackknife and Bootstrap in the Efron--Stein Light}
+
+Let $\hat\theta = T(X_1,\dots,X_n)$ be any statistic.
+
+\subsection{Delete-1 Jackknife}
+Define leave-one-out estimates $\hat\theta_{(i)}=T(X_1,\dots,\widehat{X_i},\dots,X_n)$ and their mean $\bar{\hat\theta}_{(\cdot)}=\frac1n\sum_i \hat\theta_{(i)}$. The classic jackknife variance estimator is
+\[
+  \widehat{\Var}_{\mathrm{jack}}(\hat\theta)
+  \;=\;\frac{n-1}{n}\sum_{i=1}^n \big(\hat\theta_{(i)}-\bar{\hat\theta}_{(\cdot)}\big)^2.
+\]
+\paragraph{Why it relates to ES.}
+For smooth $T$, a first-order expansion yields
+$\hat\theta-\hat\theta_{(i)} \approx \text{Inf}_i$, an empirical influence of $X_i$.
+The jackknife sums the \emph{empirical} squared influences, while Efron--Stein controls variance by \emph{population} squared influences $\E\big[(Z-Z^{(i)})^2\big]$.
+
+\begin{example}[Mean: jackknife equals truth]
+For $\hat\theta=\bar X$,
+\[
+  \widehat{\Var}_{\mathrm{jack}}(\bar X)=\frac{1}{n(n-1)}\sum_{i=1}^n (X_i-\bar X)^2
+  = \frac{s^2}{n},
+\]
+i.e.\ the unbiased sample variance $s^2$ divided by $n$, which equals $\Var(\bar X)$ under i.i.d.\ sampling (in expectation).
+\end{example}
+
+\begin{remark}[When jackknife struggles]
+For nonsmooth or highly irregular functionals (e.g.\ sample maximum, hard-thresholded estimators), leave-one-out changes are zero most of the time and occasionally large, causing bias/instability. In such cases, consider the infinitesimal jackknife or delete-$m$ jackknife below.
+\end{remark}
+
+\subsection{Infinitesimal Jackknife (IJ)}
+View $\hat\theta$ as a functional of the empirical measure $\hat P=\frac1n\sum_i \delta_{X_i}$. The (linearized) influence function $\psi$ gives
+\[
+  \hat\theta - \theta \;\approx\; \frac1n \sum_{i=1}^n \psi(X_i),
+  \qquad \E[\psi(X)]=0.
+\]
+Then
+\[
+  \Var(\hat\theta)\ \approx\ \frac{1}{n^2}\sum_{i=1}^n \psi(X_i)^2
+  \;=\; \frac{1}{n}\,\widehat{\Var}\big(\psi(X)\big),
+\]
+providing a fast variance estimate once $\psi$ (or an estimate thereof) is available. In many M-estimation problems, $\psi$ arises from a score/estimating equation.
+
+\subsection{Delete-$m$ Jackknife}
+For $m\to\infty$ with $m/n\to 0$, recompute $\hat\theta$ leaving out $m$ points, average across all (or many) subsets, and rescale to estimate variance. This smooths the instability of delete-1 for nonsmooth statistics (e.g.\ median) and often improves finite-sample performance.
+
+\subsection{Bootstrap}
+Generate $B$ resamples by sampling $n$ points with replacement from $\{X_i\}$; compute $\hat\theta_b^*=T(X_1^{*(b)},\dots,X_n^{*(b)})$; estimate
+\[
+  \widehat{\Var}_{\mathrm{boot}}(\hat\theta)
+  = \frac{1}{B-1}\sum_{b=1}^B \big(\hat\theta_b^*-\bar{\hat\theta}^*\big)^2,\quad
+  \bar{\hat\theta}^*=\frac1B\sum_{b=1}^B \hat\theta_b^*.
+\]
+\paragraph{Intervals.} Percentile, basic, studentized, and BCa (bias-corrected and accelerated) intervals offer increasing accuracy, with BCa often preferred for skewed or biased statistics.
+
+\paragraph{Conceptual link to ES.}
+Each bootstrap resample reweights (and replicates) coordinates, effectively randomizing their contributions. The resulting empirical variance of $\hat\theta^*$ estimates the same sensitivity structure that ES bounds theoretically.
+
+\section{Case Studies Revisited}
+
+\subsection{Median}
+Asymptotically, $\Var(\tilde X_n)\approx 1/(4n f(m)^2)$. Practically:
+\begin{itemize}[leftmargin=1.3em]
+  \item Delete-1 jackknife can be biased/unstable.
+  \item Delete-$m$ (moderate $m$) or IJ performs better.
+  \item Bootstrap (with BCa) gives reliable variance and CIs, especially in small to moderate $n$.
+\end{itemize}
+
+\subsection{Empirical risk (Lipschitz loss)}
+Let $Z = \frac1n\sum_{i=1}^n \ell(\theta; X_i)$ with $\ell$ $L$-Lipschitz in $X$. Then changing a single $X_i$ by an independent redraw changes $Z$ by at most $L/n$ (heuristically), yielding the quick bound
+\[
+  \Var(Z)\ \lesssim\ \tfrac12 n \cdot (L/n)^2 \;=\; \frac{L^2}{2n}.
+\]
+Jackknife/Bootstrap give data-driven refinements, often much tighter when $\ell$ has light tails.
+
+\subsection{Sample variance (sketch)}
+For $S^2=\tfrac{1}{n-1}\sum (X_i-\bar X)^2$, ES yields $\Var(S^2)=O(1/n)$ under finite fourth moment. Jackknife variance of $S^2$ is consistent; the bootstrap is also consistent and convenient for CIs on $\sigma^2$ (with caution under heavy tails).
+
+\section{Practical Guidance}
+
+\begin{itemize}[leftmargin=1.3em]
+  \item \textbf{Need an analytic upper bound?} Use Efron--Stein; it is fast, assumption-lean, and insightful for sensitivity audits.
+  \item \textbf{Smooth statistics, fast estimate?} Use jackknife or IJ.
+  \item \textbf{Nonsmooth/complex statistics or full CIs?} Use bootstrap; prefer BCa for skew/bias.
+  \item \textbf{Computational budget tight?} IJ or jackknife often give near-bootstrap accuracy at a fraction of the cost.
+\end{itemize}
+
+\section{Minimal ``Recipes'' You Can Implement}
+
+\paragraph{Delete-1 Jackknife}
+\begin{enumerate}[leftmargin=1.5em]
+  \item For $i=1,\dots,n$, compute $\hat\theta_{(i)}$ on the sample with $X_i$ removed.
+  \item Let $\bar{\hat\theta}_{(\cdot)} = \frac{1}{n}\sum_i \hat\theta_{(i)}$.
+  \item Report $\widehat{\Var}_{\mathrm{jack}} = \frac{n-1}{n}\sum_i (\hat\theta_{(i)}-\bar{\hat\theta}_{(\cdot)})^2$.
+\end{enumerate}
+
+\paragraph{Infinitesimal Jackknife (conceptual)}
+\begin{enumerate}[leftmargin=1.5em]
+  \item Obtain (or estimate) the influence function $\psi$ for $T$ at the empirical distribution.
+  \item Compute $\widehat{\Var}_{\mathrm{IJ}}(\hat\theta) = \frac{1}{n^2}\sum_{i=1}^n \psi(X_i)^2$ (or its plug-in analog).
+\end{enumerate}
+
+\paragraph{Bootstrap (nonparametric)}
+\begin{enumerate}[leftmargin=1.5em]
+  \item For $b=1,\dots,B$: sample with replacement $n$ points from $\{X_i\}$; compute $\hat\theta_b^*$.
+  \item Let $\bar{\hat\theta}^*=\frac1B\sum_b \hat\theta_b^*$; report
+  $\widehat{\Var}_{\mathrm{boot}}=\frac{1}{B-1}\sum_b (\hat\theta_b^*-\bar{\hat\theta}^*)^2$.
+  \item For CIs, use percentile or BCa rules.
+\end{enumerate}
+
+\section{Connections at a Glance}
+\begin{center}
+\begin{tabular}{@{}llp{0.55\linewidth}@{}}
+\toprule
+Method & Object perturbed & Core idea \\
+\midrule
+Efron--Stein & Single $X_i$ $\to$ independent copy $X_i'$ & Sum of expected squared leave-one-coordinate changes bounds $\Var(Z)$. \\
+Jackknife & Remove observed $X_i$ & Empirical squared leave-one-out changes estimate variance (best for smooth stats). \\
+Infinitesimal jackknife & Infinitesimal reweighting of each $X_i$ & Influence function linearization yields fast, analytic variance estimates. \\
+Bootstrap & Resample with replacement & Simulate the sampling distribution of $\hat\theta$; variance and CIs from resamples. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section*{Acknowledgments and Pointers}
+Classical references include Efron \& Stein (1981) for the inequality, Efron (1979) for the bootstrap, and Efron \& Tibshirani (1993) for an accessible resampling monograph. For concentration and ES variants, see Boucheron, Lugosi, \& Massart (2013).
+
+\begin{thebibliography}{9}
+\bibitem{EfronStein1981}
+B. Efron and C. Stein (1981).
+\newblock The jackknife estimate of variance.
+\newblock \emph{Annals of Statistics} \textbf{9}(3): 586--596.
+
+\bibitem{Efron1979}
+B. Efron (1979).
+\newblock Bootstrap methods: another look at the jackknife.
+\newblock \emph{Annals of Statistics} \textbf{7}(1): 1--26.
+
+\bibitem{EfronTib1993}
+B. Efron and R. J. Tibshirani (1993).
+\newblock \emph{An Introduction to the Bootstrap}.
+\newblock Chapman \& Hall/CRC.
+
+\bibitem{BLM2013}
+S. Boucheron, G. Lugosi, and P. Massart (2013).
+\newblock \emph{Concentration Inequalities: A Nonasymptotic Theory of Independence}.
+\newblock Oxford University Press.
+\end{thebibliography}
+
+\end{document}

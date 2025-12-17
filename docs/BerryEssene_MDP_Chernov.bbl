@@ -1,0 +1,42 @@
+\begin{thebibliography}{1}
+
+\bibitem{berry12}
+A.~C. Berry.
+\newblock The accuracy of the gaussian approximation to the distribution of
+  sums of independent variates.
+\newblock {\em Transactions of the American Mathematical Society},
+  49(1):122--136, 1941.
+
+\bibitem{chernoff}
+H.~Chernoff.
+\newblock A measure of asymptotic efficiency for tests of a hypothesis based on
+  the sum of observations.
+\newblock {\em The Annals of Mathematical Statistics}, 23(4):493--507, 1952.
+
+\bibitem{dembozeitouni}
+A.~Dembo and O.~Zeitouni.
+\newblock {\em Large Deviations Techniques and Applications}.
+\newblock Springer Science \& Business Media, 2009.
+
+\bibitem{esseen12}
+C.~G. Esseen.
+\newblock On the liapounoff limit of error in the theory of probability.
+\newblock {\em Arkiv f{"o}r matematik, astronomi och fysik}, A28(9):1--19,
+  1942.
+
+\bibitem{Mehta2004}
+M.~L. Mehta.
+\newblock {\em Random Matrices}.
+\newblock Elsevier, 3rd edition, 2004.
+
+\bibitem{Tao2012}
+T.~Tao.
+\newblock {\em Topics in Random Matrix Theory}.
+\newblock American Mathematical Society, 2012.
+
+\bibitem{Tracy1994}
+C.~A. Tracy and H.~Widom.
+\newblock Level-spacing distributions and the airy kernel.
+\newblock {\em Communications in Mathematical Physics}, 159(1):151--174, 1994.
+
+\end{thebibliography}

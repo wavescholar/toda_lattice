@@ -1,0 +1,82 @@
+\relax 
+\providecommand\babel@aux[2]{}
+\@nameuse{bbl@beforestart}
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand*\HyPL@Entry[1]{}
+\citation{feldman2011,braverman2016,lucic2018}
+\HyPL@Entry{0<</S/D>>}
+\babel@aux{english}{}
+\@writefile{toc}{\contentsline {section}{\numberline {1}The Evaluation Bottleneck in Deployed AI}{1}{section.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Setting.}{1}{section*.1}\protected@file@percent }
+\citation{gonzalez1985}
+\citation{nemhauser1978}
+\citation{kulesza2012}
+\citation{feldman2011,munteanu2018}
+\citation{drineas2012,mahoney2011}
+\newlabel{eq:coreset-guarantee}{{2}{2}{Setting}{equation.1.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}A Coreset Framework for Agent Evaluation}{2}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Step 1: Define the Evaluation Objective}{2}{subsection.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Step 2: Choose a Behavioral Representation}{2}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Step 3: Select a Construction Strategy}{2}{subsection.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{(A) Geometric coverage / diversity.}{2}{section*.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{(B) Sensitivity/importance sampling for ERM.}{2}{section*.3}\protected@file@percent }
+\newlabel{eq:sensitivity}{{4}{2}{(B) Sensitivity/importance sampling for ERM}{equation.2.4}{}}
+\citation{houlsby2011,katharopoulos2018}
+\citation{agarwal2012,harpeled2018}
+\@writefile{toc}{\contentsline {paragraph}{(C) Error-focused active coresets.}{3}{section*.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{(D) Streaming merge-and-reduce.}{3}{section*.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Step 4: Agent-Specific Adaptations}{3}{subsection.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Step 5: Weighting, Debiasing, Stratification}{3}{subsection.2.5}\protected@file@percent }
+\newlabel{eq:HT}{{5}{3}{Step 5: Weighting, Debiasing, Stratification}{equation.2.5}{}}
+\@writefile{toc}{\contentsline {paragraph}{Stratification.}{3}{section*.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.6}Step 6: Validation and Accept/Reject}{3}{subsection.2.6}\protected@file@percent }
+\citation{li2011}
+\citation{braverman2016,feldman2013}
+\citation{feldman2011,munteanu2018}
+\citation{campbell2018,huggins2016}
+\citation{gretton2012}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Theory Highlights and Useful Bounds}{4}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Uniform Approximation and Range Spaces}{4}{subsection.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Sensitivity Sampling Guarantees}{4}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Variance Control and Concentration}{4}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Bayesian Coresets (optional for reward/risk models)}{4}{subsection.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Drift Detection on Coreset Streams}{4}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{MMD$^2$.}{4}{section*.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{2-Wasserstein.}{5}{section*.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Fr\'echet-type distances.}{5}{section*.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Practical Implementation and Validation}{5}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Weighted Farthest-First with Difficulty (Geometric Baseline)}{5}{subsection.5.1}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Weighted Farthest-First with Difficulty Prioritization}}{5}{algorithm.1}\protected@file@percent }
+\newlabel{alg:weighted-k-center}{{1}{5}{Weighted Farthest-First with Difficulty (Geometric Baseline)}{algorithm.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Sensitivity (ERM) Coreset via Proxy Gradients}{5}{subsection.5.2}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {2}{\ignorespaces Sensitivity / Importance-Sampled ERM Coreset}}{5}{algorithm.2}\protected@file@percent }
+\newlabel{alg:sensitivity}{{2}{5}{Sensitivity (ERM) Coreset via Proxy Gradients}{algorithm.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Streaming Merge-and-Reduce (Scalable)}{5}{subsection.5.3}\protected@file@percent }
+\@writefile{loa}{\contentsline {algorithm}{\numberline {3}{\ignorespaces Streaming Merge-and-Reduce}}{5}{algorithm.3}\protected@file@percent }
+\newlabel{alg:streaming}{{3}{5}{Streaming Merge-and-Reduce (Scalable)}{algorithm.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Confidence Intervals and Power}{6}{subsection.5.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Concrete Recipes and Lifecycle Integration}{6}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Recipes}{6}{subsection.6.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Lifecycle Integration}{6}{subsection.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Limitations and Open Directions}{6}{section.7}\protected@file@percent }
+\bibcite{agarwal2012}{{1}{2012}{{Agarwal et al.}}{{}}}
+\bibcite{braverman2016}{{2}{2016}{{Braverman et al.}}{{}}}
+\bibcite{campbell2018}{{3}{2018}{{Campbell \& Broderick}}{{}}}
+\bibcite{drineas2012}{{4}{2012}{{Drineas et al.}}{{}}}
+\bibcite{feldman2011}{{5}{2011}{{Feldman \& Langberg}}{{}}}
+\bibcite{feldman2013}{{6}{2013}{{Feldman et al.}}{{}}}
+\bibcite{gonzalez1985}{{7}{1985}{{Gonzalez}}{{}}}
+\bibcite{gretton2012}{{8}{2012}{{Gretton et al.}}{{}}}
+\bibcite{harpeled2018}{{9}{2018}{{Har-Peled \& Mazumdar}}{{}}}
+\bibcite{houlsby2011}{{10}{2011}{{Houlsby et al.}}{{}}}
+\bibcite{huggins2016}{{11}{2016}{{Huggins et al.}}{{}}}
+\bibcite{katharopoulos2018}{{12}{2018}{{Katharopoulos \& Fleuret}}{{}}}
+\bibcite{kulesza2012}{{13}{2012}{{Kulesza \& Taskar}}{{}}}
+\bibcite{li2011}{{14}{2011}{{Li et al.}}{{}}}
+\bibcite{liang2022}{{15}{2022}{{Liang et al.}}{{}}}
+\bibcite{lucic2018}{{16}{2018}{{Lucic et al.}}{{}}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Conclusion}{7}{section.8}\protected@file@percent }
+\bibcite{mahoney2011}{{17}{2011}{{Mahoney}}{{}}}
+\bibcite{munteanu2018}{{18}{2018}{{Munteanu \& Schwiegelshohn}}{{}}}
+\bibcite{nemhauser1978}{{19}{1978}{{Nemhauser et al.}}{{}}}
+\gdef \@abspage@last{8}

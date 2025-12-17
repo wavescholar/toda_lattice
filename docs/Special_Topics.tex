@@ -1,0 +1,439 @@
+% !TEX TS-program = xelatex
+\documentclass[12pt, letterpaper]{article}
+
+% ---------- Shared document settings ----------
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+% ---------- Additional utilities ----------
+\usepackage{microtype}
+\usepackage{mathtools}
+\usepackage{bbm}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage[nameinlink]{cleveref}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!55!black,
+  citecolor=blue!55!black,
+  urlcolor=blue!55!black,
+  pdfauthor={},
+  pdftitle={Special Topics: Short Notes},
+  pdfcreator={}
+}
+
+% ---------- Theorems & macros ----------
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\1}{\mathbbm{1}}
+
+% ---------- Title ----------
+\title{Special Topics: \\ Short Notes}
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Short notes in topics from HDP and Analysis 
+\end{abstract}
+
+\section{Bernstein Theorem}
+
+% --- Bernstein's inequality on the unit circle and the Erdős--Lax refinement ---
+
+\begin{theorem}[Bernstein's inequality on $\mathbb T$]
+Let $p$ be a complex polynomial of degree $n$. Then
+\[
+\max_{|z|=1}|p'(z)| \;\le\; n\,\max_{|z|=1}|p(z)|.
+\]
+Moreover, the constant $n$ is sharp.
+\end{theorem}
+
+\begin{proof}
+Write $p(z)=z^{n}F(z)$, where $F$ is analytic in the exterior disk
+$\{z:|z|>0\}$ and holomorphic at $\infty$ with $F(\infty)=\text{(leading coefficient)}$.
+For $|z|=1$ we have
+\[
+p'(z)=n z^{n-1}F(z)+z^{n}F'(z).
+\]
+Set $M:=\max_{|w|=1}|p(w)|=\max_{|w|=1}|F(w)|$. Since $F$ is analytic on
+$\{|w|\ge 1\}\cup\{\infty\}$ and bounded on $|w|=1$, the maximum-modulus
+principle on the exterior domain implies $\sup_{|w|\ge 1}|F(w)|=M$.
+Fix $z$ with $|z|=1$ and apply Cauchy’s estimate to $F'$ on the circle
+$|w|=R>1$:
+\[
+|F'(z)| \;\le\; \frac{1}{R-1}\,\max_{|w|=R}|F(w)| \;\le\; \frac{M}{R-1}.
+\]
+Letting $R\to\infty$ gives $F'(z)=0$ for $|z|=1$, hence
+$|p'(z)|=n|F(z)|\le nM$. Taking the maximum over $|z|=1$ yields the claim.
+\end{proof}
+
+\begin{remark}[Sharpness]
+Equality holds for $p(z)=c\,z^{n}$ (any $c\in\mathbb C$), since
+$\max_{|z|=1}|p'(z)|=n|c|=\;n\,\max_{|z|=1}|p(z)|$.
+More generally, equality occurs for rotations of such extremals.
+\end{remark}
+
+\begin{theorem}[Erdős--Lax refinement]
+If $p$ has no zeros in the open unit disk $\{z:|z|<1\}$, then
+\[
+\max_{|z|=1}|p'(z)| \;\le\; \frac{n}{2}\,\max_{|z|=1}|p(z)|,
+\]
+and the factor $\tfrac{1}{2}$ is best possible.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+If $p$ is zero-free in $|z|<1$, then $F(z):=\dfrac{z\,p'(z)}{p(z)}$ is analytic on
+$|z|<1$. A standard Herglotz–Carathéodory argument applied to
+$G(z):=1-\dfrac{z\,p'(z)}{n\,p(z)}$ (which has nonnegative real part on $|z|<1$)
+gives $|z\,p'(z)|\le \tfrac{n}{2}|p(z)|$ for $|z|=1$.
+Sharpness is witnessed by extremals of the form
+$p(z)=c\,(z-a)^{n}$ with $|a|>1$ (limit cases as $|a|\downarrow 1$).
+\end{proof}
+
+\begin{remark}[{Comparison with Markov on $[-1,1]$}]
+On the interval $[-1,1]$ one has Markov's inequality
+$\max_{[-1,1]}|q'|\le n^{2}\max_{[-1,1]}|q|$ for algebraic polynomials $q$,
+illustrating the stronger $n^{2}$ growth on an interval versus the $n$ (or $n/2$)
+growth on the unit circle.
+\end{remark}
+
+
+\section{Bernstein on the circle, Erdős--Lax, and contrasts with Markov on \([-1,1]\)}
+\label{sec:bernstein-markov}
+
+\subsection{Context and scope}
+This note distills our discussion of Bernstein-type inequalities for complex
+polynomials on the unit circle, the Erdős--Lax refinement in the zero-free
+case, and how these compare with the classical Markov inequality on the real
+interval \([-1,1]\). We also record the (separate) Bernstein polynomials used
+in the constructive proof of the Weierstrass approximation theorem and explain
+how the various ``Bernstein'' results are related in spirit but address
+different questions.
+
+\subsection{Bernstein's inequality on the unit circle}
+\begin{theorem}[Bernstein inequality on $\mathbb T$]
+\label{thm:bernstein}
+Let $p$ be a complex polynomial of degree $n$. Then
+\[
+\max_{|z|=1}|p'(z)| \;\le\; n\,\max_{|z|=1}|p(z)|,
+\]
+and the constant $n$ is sharp.
+\end{theorem}
+
+\begin{proof}[Proof sketch (Cauchy/maximum-modulus)]
+Fix $R>1$ and apply Cauchy's integral formula for derivatives to $p$ on the
+circle $|w|=R$:
+\[
+p'(z)=\frac{1}{2\pi i}\int_{|w|=R}\frac{p(w)}{(w-z)^2}\,dw
+\qquad (|z|\le 1).
+\]
+Taking moduli and using $\min_{|w|=R,\,|z|=1}|w-z|=R-1$ gives
+\(
+|p'(z)|\le \frac{R}{(R-1)^2}\,\max_{|w|=R}|p(w)|.
+\)
+By the maximum modulus principle, $\max_{|w|=R}|p(w)|\le R^n\max_{|u|=1}|p(u)|$.
+Optimizing in $R$ yields the inequality with constant $n$ (e.g.\ let $R\downarrow 1$
+and use a standard smoothing argument, or consider $f(\zeta):=\zeta p'(\zeta)/(n p(\zeta))$
+which is analytic in $|\zeta|<1$ and has $|f|\le 1$ on $|\zeta|=1$).
+Sharpness holds for $p(z)=c\,z^{n}$, where equality is attained.
+\end{proof}
+
+\begin{remark}[Trigonometric form]
+If $T(\theta)=\sum_{k=-n}^n c_k e^{ik\theta}$ is a trigonometric polynomial of
+degree $n$, then
+\[
+\|T'\|_{L^\infty(\mathbb T)} \le n\,\|T\|_{L^\infty(\mathbb T)}.
+\]
+This is the same inequality under the identification $p(e^{i\theta})=T(\theta)$.
+\end{remark}
+
+\subsection{Erdős--Lax refinement (zero-free case)}
+\begin{theorem}[Erdős--Lax]
+\label{thm:erdos-lax}
+If $p$ has no zeros in $\{z:|z|<1\}$, then
+\[
+\max_{|z|=1}|p'(z)| \;\le\; \frac{n}{2}\,\max_{|z|=1}|p(z)|,
+\]
+and the factor $\tfrac{1}{2}$ is best possible.
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+When $p$ is zero-free in the disk, the function
+\(
+F(z):=\dfrac{z\,p'(z)}{p(z)}
+\)
+is analytic for $|z|<1$. Consider 
+\(
+G(z):=1-\frac{1}{n}F(z)=1-\frac{z\,p'(z)}{n\,p(z)},
+\)
+which has nonnegative real part in the unit disk (Herglotz--Carathéodory
+theory for analytic functions with positive real part). Boundary estimates for
+such functions imply $|F(e^{it})|\le \tfrac{n}{2}$ for a.e.\ $t$, hence the
+stated inequality on $|z|=1$. Sharpness is witnessed by extremals tending to
+$p(z) = c\,(z-a)^n$ with $|a|\downarrow 1$.
+\end{proof}
+
+\subsection{Markov's inequality on \([-1,1]\) and a precise contrast}
+\begin{theorem}[Markov, 1889]
+\label{thm:markov}
+If $q$ is a real (algebraic) polynomial of degree $n$, then
+\[
+\max_{x\in[-1,1]}|q'(x)| \;\le\; n^2\,\max_{x\in[-1,1]}|q(x)|,
+\]
+and the exponent $n^2$ is sharp (attained, up to the constant, by the
+Chebyshev polynomials $T_n$).
+\end{theorem}
+
+\begin{proof}[Proof sketch and extremals]
+Normalize so that $\|q\|_{[-1,1]}\le 1$. Among all degree-$n$ polynomials with
+unit sup-norm, $T_n(\cos\theta)=\cos(n\theta)$ oscillates between $\pm 1$ with
+equal ripple and has maximal derivative at the endpoints:
+$T_n'(1)=n^2$ and $\|T_n'\|_{[-1,1]}=n^2$. A standard argument (via
+convexity of the feasible set and extreme point/ripple characterizations,
+or via potential theory/Markov brothers' method) shows $T_n$ is extremal,
+yielding the sharp constant $n^2$.
+\end{proof}
+
+\paragraph{Why $n$ on $\mathbb T$ but $n^2$ on $[-1,1]$?}
+Two complementary viewpoints:
+\begin{itemize}
+  \item \emph{Geometry of the domain.} On the smooth closed curve \(|z|=1\),
+        Cauchy’s estimate couples the growth of $p'$ linearly with degree
+        (one derivative $\leftrightarrow$ one power of $n$). On \([-1,1]\),
+        the boundary has endpoints where extremals concentrate curvature
+        (boundary layer near $\pm 1$). This produces an extra factor of $n$.
+  \item \emph{Conformal map heuristic.} The Joukowski map
+        $J(\zeta)=\frac{1}{2}(\zeta+\zeta^{-1})$ sends the circle to the
+        interval. Pulling a degree-$n$ algebraic polynomial on \([-1,1]\) back
+        to the circle yields a \emph{sum of two} degree-$n$ terms (from
+        $\zeta^k$ and $\zeta^{-k}$), and differentiation on the circle then
+        costs a factor $n$ while the pullback/pushforward introduces another
+        factor $n$, giving the $n^2$ scaling.
+\end{itemize}
+
+\paragraph{Quantitative refinements on \([-1,1]\).}
+More precise inequalities localize the derivative size:
+\[
+|q'(x)| \;\le\; \frac{n^2}{\sqrt{1-x^2}}\,\|q\|_{[-1,1]},
+\qquad |x|<1,
+\]
+and near the endpoints $x=\pm 1$ the $\sqrt{1-x^2}$ denominator captures the
+boundary layer responsible for the $n^2$ growth.
+
+\subsection{Further connections and nearby inequalities}
+\begin{itemize}
+  \item \textbf{$L^p$ versions on $\mathbb T$.} For $1\le p\le\infty$ and
+        trigonometric polynomials $T$ of degree $n$,
+        \(\|T'\|_{L^p(\mathbb T)}\le n\,\|T\|_{L^p(\mathbb T)}\)
+        (Riesz--Zygmund/Nikolskii-type estimates).
+  \item \textbf{Zero-free gains.} Erdős--Lax (Thm.~\ref{thm:erdos-lax})
+        demonstrates how excluding zeros from the disk halves the constant
+        from $n$ to $n/2$. Analogous ``stability under zero separation''
+        phenomena appear in inequalities on other domains.
+  \item \textbf{Intervals and orthogonal bases.} On \([-1,1]\), Chebyshev
+        polynomials serve as extremals for both the value problem (minimax
+        deviation) and the derivative problem (Markov). This dual role
+        explains the sharpness and suggests practical preconditioners in
+        spectral methods.
+\end{itemize}
+
+\subsection{Bernstein polynomials for approximation (a different ``Bernstein'')}
+Distinct from the derivative inequality, Bernstein's constructive proof of the
+Weierstrass theorem uses the positive linear operators
+\[
+(B_n f)(x)
+=\sum_{k=0}^{n} f\!\left(\frac{k}{n}\right)\binom{n}{k}x^{k}(1-x)^{n-k},
+\qquad x\in[0,1],
+\]
+which satisfy $B_n f \to f$ uniformly on $[0,1]$ for every continuous $f$.
+These polynomials are linked in spirit (they control oscillation and are built
+from binomial bases) but address approximation of \emph{functions} rather than
+derivative bounds for a \emph{given polynomial}. The positivity and shape
+preservation of $B_n$ provide quantitative moduli-of-continuity estimates:
+\[
+\|B_n f - f\|_{[0,1]} \;\le\; \omega\!\left(f; \sqrt{\frac{x(1-x)}{n}}\right),
+\]
+and, for Lipschitz $f$, a global $O(n^{-1/2})$ rate.
+
+\subsection{Summary table}
+\begin{center}
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lll}
+\toprule
+\textbf{Setting} & \textbf{Inequality} & \textbf{Sharp constant / extremals}\\
+\midrule
+Unit circle $\{|z|=1\}$ & $\displaystyle \max_{|z|=1}|p'|\le n\,\max_{|z|=1}|p|$
+& $n$; $p(z)=c\,z^n$ \\
+Zero-free in $|z|<1$ & $\displaystyle \max_{|z|=1}|p'|\le \tfrac{n}{2}\max_{|z|=1}|p|$
+& $\tfrac{n}{2}$; limiting $(z-a)^n$, $|a|\downarrow 1$ \\
+Interval $[-1,1]$ & $\displaystyle \max_{[-1,1]}|q'|\le n^2\,\max_{[-1,1]}|q|$
+& $n^2$; $q=T_n$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Drop-in theorems for use elsewhere}
+\begin{theorem}[Bernstein, unit circle]
+Let $p$ be a degree-$n$ polynomial. Then
+$\max_{|z|=1}|p'(z)| \le n \max_{|z|=1}|p(z)|$, with equality for $p(z)=c\,z^n$.
+\end{theorem}
+
+\begin{theorem}[Erdős--Lax]
+If $p$ has no zeros in $|z|<1$, then
+$\max_{|z|=1}|p'(z)| \le \tfrac{n}{2}\max_{|z|=1}|p(z)|$, and $\tfrac{1}{2}$ is sharp.
+\end{theorem}
+
+\begin{theorem}[Markov]
+For a real polynomial $q$ of degree $n$,
+$\max_{x\in[-1,1]}|q'(x)| \le n^2 \max_{x\in[-1,1]}|q(x)|$, with sharpness at $q=T_n$.
+\end{theorem}
+
+\subsection{Practical takeaways}
+\begin{itemize}
+  \item On smooth closed curves (e.g.\ the circle), a single derivative costs
+        a single power of $n$; excluding interior zeros improves the constant
+        by a factor 2.
+  \item On intervals with endpoints, boundary layers inflate the growth to
+        $n^2$; Chebyshev structure captures the extremal behavior and guides
+        numerical design.
+  \item ``Bernstein polynomials'' for approximation are different objects:
+        positive linear approximants that converge uniformly and provide
+        constructive bounds for $\|B_n f - f\|$.
+\end{itemize}
+
+\section{Density of Polynomials and the Bernstein Expectation Proof}
+\label{sec:poly-density-bernstein}
+
+This section records concise answers to two related questions from our chat:
+(1) \emph{When are (algebraic) polynomials dense?} and (2) \emph{How does the
+Bernstein expectation argument prove uniform approximation on \([0,1]\)?}
+
+\subsection*{Where polynomials are (and are not) dense}
+
+\begin{itemize}
+  \item \textbf{Weierstrass (univariate, compact).}
+  In \(C([a,b])\) with the sup norm, algebraic polynomials are dense.
+
+  \item \textbf{Stone--Weierstrass (multivariate, compact).}
+  Let \(K\subset\mathbb{R}^n\) be compact. The algebra of polynomials in
+  \(n\) variables separates points and contains the constants, hence it is
+  uniformly dense in \(C(K)\).
+
+  \item \textbf{\(L^p\) on finite measure sets.}
+  For \(1\le p<\infty\), polynomials are dense in \(L^p([a,b])\) and more
+  generally in weighted \(L^p([a,b],w\,dx)\) whenever \(w>0\) a.e.
+
+  \item \textbf{Analytic function spaces (classics).}
+  Polynomials are dense in the disc algebra \(A(\mathbb{D})\) (uniformly on
+  \(\overline{\mathbb{D}}\)) and in Hardy spaces \(H^p\) on the unit disc
+  (convergence in the \(H^p\) norm). Trigonometric polynomials are dense in
+  \(C(\mathbb{T})\) and \(L^p(\mathbb{T})\).
+
+  \item \textbf{Failure cases.}
+  In \(C_b(\mathbb{R})\) with the sup norm, polynomials are not dense:
+  polynomials are unbounded and cannot uniformly approximate bounded
+  functions on all of \(\mathbb{R}\). In \(L^p(\mathbb{R})\) with Lebesgue
+  measure, nonzero polynomials do not even belong to the space; with
+  decaying weights (e.g.\ Gaussian) density can be recovered.
+
+  \item \textbf{Müntz--Szász (sparse monomials).}
+  For exponents \(\{\lambda_k\}\subset(0,\infty)\), the linear span of
+  \(\{1,x^{\lambda_k}:k\ge1\}\) is dense in \(C([0,1])\) iff
+  \(\sum_k \lambda_k^{-1}=\infty\).
+\end{itemize}
+
+\subsection*{Bernstein polynomials via expectations}
+
+Fix a continuous \(f:[0,1]\to\mathbb{R}\). For \(x\in[0,1]\), let
+\(S_n\sim \mathrm{Bin}(n,x)\) (i.e.\ \(S_n=\sum_{i=1}^n X_i\) with
+\(X_i\stackrel{iid}{\sim}\mathrm{Bernoulli}(x)\)). The \emph{Bernstein
+operator} is
+\[
+B_nf(x)\;=\;\mathbb{E}\!\left[f\!\left(\frac{S_n}{n}\right)\right]
+=\sum_{k=0}^n f\!\left(\frac{k}{n}\right)\binom{n}{k}x^k(1-x)^{n-k},
+\]
+a polynomial of degree \(\le n\).
+
+\paragraph{Uniform approximation.}
+Let the modulus of continuity be
+\(\omega_f(\delta)=\sup\{|f(u)-f(v)|:\,|u-v|\le\delta,\;u,v\in[0,1]\}\),
+with \(\omega_f(\delta)\to0\) as \(\delta\downarrow0\). For any
+\(\delta>0\),
+\[
+\begin{aligned}
+|B_nf(x)-f(x)|
+&=\big|\mathbb{E}\big[f(S_n/n)-f(x)\big]\big| \\
+&\le \mathbb{E}\!\left[|f(S_n/n)-f(x)|\;\mathbf{1}_{\{|S_n/n-x|\le\delta\}}\right]
+   +\mathbb{E}\!\left[|f(S_n/n)-f(x)|\;\mathbf{1}_{\{|S_n/n-x|>\delta\}}\right] \\
+&\le \omega_f(\delta)+2\|f\|_\infty\;\mathbb{P}(|S_n/n-x|>\delta).
+\end{aligned}
+\]
+Since \(\operatorname{Var}(S_n/n)=x(1-x)/n\le 1/(4n)\), Chebyshev yields
+\[
+\mathbb{P}(|S_n/n-x|>\delta)\le\frac{1}{4n\delta^2},
+\]
+so, uniformly in \(x\in[0,1]\),
+\[
+\|B_nf-f\|_\infty \;\le\; \omega_f(\delta) + \frac{\|f\|_\infty}{2n\delta^2}.
+\]
+Given \(\varepsilon>0\), choose \(\delta\) with \(\omega_f(\delta)<\varepsilon/2\),
+then \(n\) so that \(\|f\|_\infty/(2n\delta^2)<\varepsilon/2\); hence
+\(\|B_nf-f\|_\infty<\varepsilon\).
+
+\paragraph{Exponential tails (optional).}
+Hoeffding’s inequality improves the tail:
+\[
+\mathbb{P}(|S_n/n-x|>\delta)\le 2e^{-2n\delta^2},
+\quad\Rightarrow\quad
+\|B_nf-f\|_\infty \le \omega_f(\delta)+4\|f\|_\infty e^{-2n\delta^2}.
+\]
+
+\paragraph{Rates under smoothness (optional).}
+If \(f\) is Lipschitz with constant \(L\),
+\[
+|B_nf(x)-f(x)|\le L\,\mathbb{E}|S_n/n-x|
+\le L\sqrt{\mathrm{Var}(S_n/n)} \le \frac{L}{2\sqrt{n}}.
+\]
+If \(f\in C^2([0,1])\), a Taylor expansion at \(x\) and
+\(\mathbb{E}(S_n/n-x)=0\), \(\mathbb{E}(S_n/n-x)^2=x(1-x)/n\) give the classical
+bias:
+\[
+B_nf(x)-f(x) \;=\; \tfrac12 f''(x)\,\frac{x(1-x)}{n} \;+\; o\!\left(\frac{1}{n}\right).
+\]
+
+\medskip
+\noindent\textbf{Summary.} The Bernstein operator \(B_n\) realizes the law of
+large numbers at the level of functions: sampling at the empirical mean
+\(S_n/n\) concentrates around \(x\), and the continuity of \(f\) transfers this
+concentration into uniform approximation by polynomials.
+
+
+\begin{thebibliography}{9}
+
+\bibitem{BLM2013}
+S. Boucheron, G. Lugosi, and P. Massart (2013).
+\newblock \emph{Concentration Inequalities: A Nonasymptotic Theory of Independence}.
+\newblock Oxford University Press.
+\end{thebibliography}
+
+\end{document}

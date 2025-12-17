@@ -1,0 +1,61 @@
+\contentsline {section}{\numberline {1}Introduction}{2}{section.1}%
+\contentsline {section}{\numberline {2}1. The Classical Toda Lattice}{2}{section.2}%
+\contentsline {subsection}{\numberline {2.1}1.1 Hamiltonian Formulation}{2}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}1.2 Equations of Motion}{3}{subsection.2.2}%
+\contentsline {section}{\numberline {3}2. From Nonlinear to Linear: The Need for a New Formulation}{3}{section.3}%
+\contentsline {subsection}{\numberline {3.1}2.1 Motivation}{3}{subsection.3.1}%
+\contentsline {section}{\numberline {4}3. Flaschka's Change of Variables}{3}{section.4}%
+\contentsline {section}{\numberline {5}4. Why This Form is Significant}{4}{section.5}%
+\contentsline {subsubsection}{\numberline {5.0.1}First-order}{4}{subsubsection.5.0.1}%
+\contentsline {subsubsection}{\numberline {5.0.2}Bilinear}{4}{subsubsection.5.0.2}%
+\contentsline {subsubsection}{\numberline {5.0.3}Commutator-Like}{4}{subsubsection.5.0.3}%
+\contentsline {section}{\numberline {6}5. Constructing the Lax Pair}{4}{section.6}%
+\contentsline {subsection}{\numberline {6.1}5.1 The Lax Matrix \$ L \$}{4}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}5.2 The Skew-Symmetric Matrix \$ B \$}{4}{subsection.6.2}%
+\contentsline {section}{\numberline {7}6. Verifying the Lax Equation}{5}{section.7}%
+\contentsline {subsection}{\numberline {7.1}6.1 Diagonal Entries}{5}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}6.2 Off-Diagonal Entries}{5}{subsection.7.2}%
+\contentsline {section}{\numberline {8}7. Insights Behind the Derivation}{5}{section.8}%
+\contentsline {subsubsection}{\numberline {8.0.1}Theoretical Motivation}{5}{subsubsection.8.0.1}%
+\contentsline {subsubsection}{\numberline {8.0.2}Creative Guesses}{5}{subsubsection.8.0.2}%
+\contentsline {section}{\numberline {9}8. Consequences of the Lax Pair}{6}{section.9}%
+\contentsline {section}{\numberline {10}9. Conclusion}{6}{section.10}%
+\contentsline {section}{\numberline {11}Appendix: Computing the Commutator \$ {[}B, L{]} \$}{6}{section.11}%
+\contentsline {subsection}{\numberline {11.1}Diagonal Entries \$ i = j \$}{6}{subsection.11.1}%
+\contentsline {subsection}{\numberline {11.2}Off-Diagonal Entries \$ i, i+1 \$}{6}{subsection.11.2}%
+\contentsline {section}{\numberline {12}Paradigmatic Integrable Systems}{7}{section.12}%
+\contentsline {subsection}{\numberline {12.1}Key concepts: Liouville integrability and exact solvability}{7}{subsection.12.1}%
+\contentsline {paragraph}{Liouville integrability (finite-dimensional classical systems).}{7}{section*.4}%
+\contentsline {paragraph}{Exact solvability and Lax pairs.}{8}{section*.5}%
+\contentsline {paragraph}{Non-chaotic dynamics.}{8}{section*.6}%
+\contentsline {subsection}{\numberline {12.2}Classical paradigms}{8}{subsection.12.2}%
+\contentsline {subsubsection}{\numberline {12.2.1}Toda lattice}{8}{subsubsection.12.2.1}%
+\contentsline {paragraph}{Example: elastic soliton-like scattering.}{9}{section*.7}%
+\contentsline {subsubsection}{\numberline {12.2.2}KdV equation}{9}{subsubsection.12.2.2}%
+\contentsline {paragraph}{Example: one-soliton solution.}{9}{section*.8}%
+\contentsline {subsection}{\numberline {12.3}Quantum paradigms}{9}{subsection.12.3}%
+\contentsline {subsubsection}{\numberline {12.3.1}Lieb--Liniger (1D Bose gas)}{9}{subsubsection.12.3.1}%
+\contentsline {paragraph}{Example: Tonks--Girardeau limit.}{9}{section*.9}%
+\contentsline {subsubsection}{\numberline {12.3.2}Heisenberg XXZ spin chain}{10}{subsubsection.12.3.2}%
+\contentsline {paragraph}{Example: magnon excitations.}{10}{section*.10}%
+\contentsline {subsubsection}{\numberline {12.3.3}Hubbard chain}{10}{subsubsection.12.3.3}%
+\contentsline {paragraph}{Example: spin--charge separation.}{10}{section*.11}%
+\contentsline {subsection}{\numberline {12.4}Why paradigmatic integrable systems matter}{10}{subsection.12.4}%
+\contentsline {paragraph}{Benchmarks for approximation and numerics.}{10}{section*.12}%
+\contentsline {paragraph}{Emergent phenomena: solitons, hydrodynamics, entanglement.}{10}{section*.13}%
+\contentsline {paragraph}{Deep structure: symmetry, geometry, and algebra.}{10}{section*.14}%
+\contentsline {paragraph}{Experimental relevance.}{10}{section*.15}%
+\contentsline {section}{\numberline {13}Hamiltonian Systems and the Toda Lattice}{11}{section.13}%
+\contentsline {subsection}{\numberline {13.1}Overview of Hamiltonian Mechanics}{11}{subsection.13.1}%
+\contentsline {subsection}{\numberline {13.2}The Toda Lattice as a Hamiltonian System}{11}{subsection.13.2}%
+\contentsline {subsubsection}{\numberline {13.2.1}Hamiltonian Form}{11}{subsubsection.13.2.1}%
+\contentsline {subsubsection}{\numberline {13.2.2}Equations of Motion}{11}{subsubsection.13.2.2}%
+\contentsline {subsection}{\numberline {13.3}Integrability and Soliton Solutions}{11}{subsection.13.3}%
+\contentsline {section}{\numberline {14}Generalized Hydrodynamics and the Toda Lattice}{12}{section.14}%
+\contentsline {subsection}{\numberline {14.1}What is Generalized Hydrodynamics (GHD)?}{12}{subsection.14.1}%
+\contentsline {subsection}{\numberline {14.2}Hamiltonian Structure of GHD}{12}{subsection.14.2}%
+\contentsline {subsection}{\numberline {14.3}Application of GHD to the Toda Lattice}{12}{subsection.14.3}%
+\contentsline {subsubsection}{\numberline {14.3.1}Gas and Chain Pictures}{12}{subsubsection.14.3.1}%
+\contentsline {subsubsection}{\numberline {14.3.2}Thermodynamic Bethe Ansatz (TBA)}{13}{subsubsection.14.3.2}%
+\contentsline {subsubsection}{\numberline {14.3.3}Correlation Dynamics and Transport}{13}{subsubsection.14.3.3}%
+\contentsline {subsection}{\numberline {14.4}Summary Table}{13}{subsection.14.4}%
